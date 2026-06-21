@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>你该换工作，还是换活法？</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500&display=swap');
+
+  :root {
+    --ink: #1a1a2e;
+    --ink-soft: #4a4a6a;
+    --ink-muted: #8888aa;
+    --fog: #f0eff8;
+    --fog-deep: #e4e2f4;
+    --accent: #7b6fa0;
+    --accent-light: #c4bde0;
+    --glow: #b8d4c8;
+    --glow-light: #dff0e8;
+    --warm: #e8c4a0;
+    --paper: #fafaf8;
+    --selected-bg: #eeeaf8;
+    --selected-border: #7b6fa0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--fog);
+    font-family: 'Noto Sans SC', 'PingFang SC', sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 0 0 60px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* ambient background shapes */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -120px; right: -120px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(196,189,224,0.35) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: -80px; left: -80px;
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, rgba(184,212,200,0.3) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 52px 0 36px;
+    text-align: center;
+  }
+
+  .hero-tag {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    background: var(--fog-deep);
+    border: 1px solid var(--accent-light);
+    border-radius: 20px;
+    padding: 4px 14px;
+    margin-bottom: 20px;
+    font-weight: 500;
+  }
+
+  .hero h1 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: clamp(24px, 6vw, 32px);
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--ink);
+    margin-bottom: 14px;
+    letter-spacing: -0.01em;
+  }
+
+  .hero h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    line-height: 1.7;
+    max-width: 380px;
+    margin: 0 auto 28px;
+    font-weight: 300;
+  }
+
+  .hero-meta {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    font-size: 12px;
+    color: var(--ink-muted);
+  }
+
+  .hero-meta span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  /* progress */
+  .progress-bar-wrap {
+    background: var(--fog-deep);
+    border-radius: 4px;
+    height: 4px;
+    margin: 0 0 40px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-light), var(--accent));
+    border-radius: 4px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  .progress-label {
+    font-size: 11px;
+    color: var(--ink-muted);
+    text-align: right;
+    margin-bottom: 8px;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── QUESTIONS ── */
+  .question-block {
+    background: var(--paper);
+    border-radius: 20px;
+    padding: 28px 24px;
+    margin-bottom: 16px;
+    border: 1px solid rgba(123,111,160,0.1);
+    box-shadow: 0 2px 16px rgba(26,26,46,0.04);
+    transition: box-shadow 0.2s;
+  }
+
+  .question-block:hover {
+    box-shadow: 0 4px 24px rgba(26,26,46,0.07);
+  }
+
+  .q-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  .q-num {
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    background: var(--fog-deep);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    margin-top: 1px;
+  }
+
+  .q-text {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 15.5px;
+    font-weight: 600;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    padding-left: 42px;
+  }
+
+  .option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1.5px solid var(--fog-deep);
+    cursor: pointer;
+    transition: all 0.18s ease;
+    background: var(--fog);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .option:hover {
+    border-color: var(--accent-light);
+    background: var(--selected-bg);
+  }
+
+  .option.selected {
+    border-color: var(--selected-border);
+    background: var(--selected-bg);
+    box-shadow: 0 0 0 3px rgba(123,111,160,0.08);
+  }
+
+  .option-letter {
+    flex-shrink: 0;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 1.5px solid var(--ink-muted);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--ink-muted);
+    margin-top: 1px;
+    transition: all 0.18s;
+  }
+
+  .option.selected .option-letter {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  .option-text {
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    font-weight: 300;
+    transition: color 0.18s;
+  }
+
+  .option.selected .option-text {
+    color: var(--ink);
+    font-weight: 400;
+  }
+
+  /* ── SUBMIT ── */
+  .submit-area {
+    text-align: center;
+    padding: 32px 0 0;
+  }
+
+  .submit-hint {
+    font-size: 12px;
+    color: var(--ink-muted);
+    margin-bottom: 16px;
+  }
+
+  .submit-hint .count {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .btn-submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 15px 48px;
+    font-size: 15px;
+    font-family: 'Noto Sans SC', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 20px rgba(123,111,160,0.35);
+    letter-spacing: 0.02em;
+  }
+
+  .btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(123,111,160,0.45);
+    background: #6a5e8f;
+  }
+
+  .btn-submit:disabled {
+    background: var(--ink-muted);
+    box-shadow: none;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* ── RESULT ── */
+  #result-panel {
+    display: none;
+  }
+
+  .result-hero {
+    padding: 48px 0 32px;
+    text-align: center;
+  }
+
+  .result-badge {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: white;
+    background: var(--accent);
+    border-radius: 20px;
+    padding: 5px 16px;
+    margin-bottom: 20px;
+    font-weight: 500;
+  }
+
+  .result-type {
+    font-family: 'Noto Serif SC', serif;
+    font-size: clamp(28px, 8vw, 40px);
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+
+  .result-subtitle {
+    font-size: 14px;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 32px;
+    letter-spacing: 0.05em;
+  }
+
+  .result-card {
+    background: var(--paper);
+    border-radius: 24px;
+    padding: 32px 28px;
+    margin-bottom: 16px;
+    border: 1px solid rgba(123,111,160,0.1);
+    box-shadow: 0 2px 20px rgba(26,26,46,0.05);
+    text-align: left;
+  }
+
+  .result-card h3 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink-muted);
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+
+  .result-card p {
+    font-size: 14.5px;
+    line-height: 1.85;
+    color: var(--ink-soft);
+    font-weight: 300;
+  }
+
+  .result-card p strong {
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .traits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .trait {
+    background: var(--fog-deep);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .divider-line {
+    height: 1px;
+    background: var(--fog-deep);
+    margin: 20px 0;
+  }
+
+  .share-cta {
+    background: linear-gradient(135deg, var(--fog-deep), var(--glow-light));
+    border-radius: 20px;
+    padding: 24px;
+    text-align: center;
+    margin-top: 8px;
+    border: 1px solid rgba(184,212,200,0.4);
+  }
+
+  .share-cta p {
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.7;
+    margin-bottom: 6px;
+  }
+
+  .share-cta .handle {
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .btn-retry {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 20px;
+    background: transparent;
+    border: 1.5px solid var(--accent-light);
+    color: var(--accent);
+    border-radius: 50px;
+    padding: 10px 28px;
+    font-size: 13px;
+    font-family: 'Noto Sans SC', sans-serif;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+
+  .btn-retry:hover {
+    background: var(--fog-deep);
+  }
+
+  @media (max-width: 480px) {
+    .question-block { padding: 22px 18px; }
+    .options { padding-left: 0; }
+    .result-card { padding: 24px 20px; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .fade-up {
+    animation: fadeUp 0.45s ease both;
+  }
+
+  .fade-up:nth-child(2) { animation-delay: 0.05s; }
+  .fade-up:nth-child(3) { animation-delay: 0.1s; }
+  .fade-up:nth-child(4) { animation-delay: 0.15s; }
+  .fade-up:nth-child(5) { animation-delay: 0.2s; }
+  .fade-up:nth-child(6) { animation-delay: 0.25s; }
+  .fade-up:nth-child(7) { animation-delay: 0.3s; }
+  .fade-up:nth-child(8) { animation-delay: 0.35s; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- TEST PANEL -->
+  <div id="test-panel">
+
+    <div class="hero">
+      <div class="hero-tag">职业心理测试</div>
+      <h1>你该换工作，<br>还是<em>换活法</em>？</h1>
+      <p class="hero-sub">你累的不是工作，是活错了位置。<br>7道题，帮你看清自己现在到底在哪里。</p>
+      <div class="hero-meta">
+        <span>⏱ 约2分钟</span>
+        <span>📊 4种结果</span>
+        <span>🔒 完全匿名</span>
+      </div>
+    </div>
+
+    <div class="progress-label"><span id="answered-count">0</span> / 7 已作答</div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <div id="questions-container"></div>
+
+    <div class="submit-area">
+      <p class="submit-hint">还有 <span class="count" id="remaining-count">7</span> 道题未完成</p>
+      <button class="btn-submit" id="btn-submit" disabled onclick="submitTest()">
+        查看我的结果 →
+      </button>
+    </div>
+
+  </div>
+
+  <!-- RESULT PANEL -->
+  <div id="result-panel">
+    <div class="result-hero fade-up">
+      <div class="result-badge">你的测试结果</div>
+      <div class="result-type" id="result-type">—</div>
+      <div class="result-subtitle" id="result-subtitle">—</div>
+    </div>
+
+    <div class="result-card fade-up">
+      <h3>你是谁</h3>
+      <p id="result-desc">—</p>
+      <div class="traits" id="result-traits"></div>
+    </div>
+
+    <div class="result-card fade-up">
+      <h3>你现在的状态</h3>
+      <p id="result-state">—</p>
+    </div>
+
+    <div class="result-card fade-up">
+      <h3>真正需要改变的是</h3>
+      <p id="result-advice">—</p>
+    </div>
+
+    <div class="share-cta fade-up">
+      <p>觉得说中了你？把答案串发小红书评论区 👇<br>格式：<strong>1A2B3C4D5A6B7C</strong></p>
+      <p style="margin-top:8px">更多职场 + 人生测试 →</p>
+      <p class="handle">@三心记（上岸版）</p>
+      <button class="btn-retry" onclick="retryTest()">↩ 重新测一次</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    text: "周一早上闹钟响的时候，你的第一反应是？",
+    options: [
+      { letter: "A", text: "再睡五分钟，用意志力把自己薅起来", score: 2 },
+      { letter: "B", text: "已经醒了，但躺着不想动，在想今天要应付哪些人", score: 3 },
+      { letter: "C", text: "起来了，但对今天没有任何期待，就是去熬", score: 4 },
+      { letter: "D", text: "闹钟还没响就醒了，脑子里转的全是没做完的事", score: 1 }
+    ]
+  },
+  {
+    text: "你上一次觉得「这件事我做得不错」是什么时候？",
+    options: [
+      { letter: "A", text: "最近有，但不是在工作上", score: 3 },
+      { letter: "B", text: "想不起来了，好像很久以前的事", score: 4 },
+      { letter: "C", text: "工作上偶尔有，但没人在乎", score: 2 },
+      { letter: "D", text: "有，但夸我的人不是我想让他夸的那个", score: 1 }
+    ]
+  },
+  {
+    text: "同事聚餐你一般是什么状态？",
+    options: [
+      { letter: "A", text: "去，但全程在演一个合群的人", score: 3 },
+      { letter: "B", text: "能不去就不去，回家躺着比什么都强", score: 4 },
+      { letter: "C", text: "去，但散场走在路上会突然觉得空", score: 2 },
+      { letter: "D", text: "还行，就是聊来聊去全是抱怨，听多了更累", score: 1 }
+    ]
+  },
+  {
+    text: "你现在的工作，最让你窒息的是？",
+    options: [
+      { letter: "A", text: "做了什么根本看不出来，像在沙漠里浇水", score: 2 },
+      { letter: "B", text: "每天重复一样的动作，脑子快生锈了", score: 1 },
+      { letter: "C", text: "努力没有回报，躺平又过不了自己那关", score: 3 },
+      { letter: "D", text: "要配合很多不想配合的人，太耗了", score: 4 }
+    ]
+  },
+  {
+    text: "朋友问你「你喜欢你的工作吗」，你怎么回答？",
+    options: [
+      { letter: "A", text: "「还行吧」，然后马上换话题", score: 2 },
+      { letter: "B", text: "直接说不喜欢，但也不知道喜欢什么", score: 3 },
+      { letter: "C", text: "「有什么好不好喜欢的，不就是赚钱吗」", score: 4 },
+      { letter: "D", text: "笑了一下，没有回答", score: 1 }
+    ]
+  },
+  {
+    text: "你有没有想过辞职？",
+    options: [
+      { letter: "A", text: "每天都想，但想完继续上班", score: 3 },
+      { letter: "B", text: "认真想过，列过计划，后来没动", score: 2 },
+      { letter: "C", text: "不敢想，想了更焦虑", score: 1 },
+      { letter: "D", text: "已经不是「想」了，在等一个时机", score: 4 }
+    ]
+  },
+  {
+    text: "如果明天不用上班，你最想做的事是？",
+    options: [
+      { letter: "A", text: "睡到自然醒，然后发呆，什么都不想干", score: 4 },
+      { letter: "B", text: "有个一直想做但没时间做的事，终于可以做了", score: 1 },
+      { letter: "C", text: "出去走走，但不知道去哪，就是想离那个地方远一点", score: 3 },
+      { letter: "D", text: "和某个人好好吃顿饭，聊聊我到底怎么了", score: 2 }
+    ]
+  }
+];
+
+const results = [
+  {
+    range: [7, 13],
+    type: "觉醒型",
+    subtitle: "你知道哪里不对，也知道自己想要什么",
+    desc: "你不是不喜欢工作这件事，你只是不喜欢<strong>现在这份工作</strong>。你对自己的状态有清醒的感知，内心有个声音一直在告诉你「这不是你想要的」，但你还没有找到合适的出口。",
+    traits: ["自我认知清晰", "有行动意愿", "需要一个触发点"],
+    state: "你现在卡在「知道」和「行动」之间。不是缺乏勇气，是还没有想清楚下一步的具体落点。你需要的不是鸡血，而是一张清单：你真正在意的是什么？",
+    advice: "不是辞职，也不是将就。是先搞清楚「你想去哪里」，再决定「要不要走」。盲目的跳槽往往只是换一个地方重复同样的困境。"
+  },
+  {
+    range: [14, 18],
+    type: "安稳型",
+    subtitle: "你没有很痛苦，但也没有很快乐",
+    desc: "你和这份工作之间，谈不上热爱，但也相安无事。你做事认真，不惹麻烦，但偶尔会想「这就是我要过的生活吗」。你害怕改变带来的风险，所以选择了一种可控的平静。",
+    traits: ["稳定感强", "风险厌恶", "内心有隐隐的空"],
+    state: "表面上你一切正常，但有一种说不清的钝感在积累。不是崩溃，是慢慢变得麻木。这种状态最危险的地方在于：它很舒适，所以你不会主动打破它。",
+    advice: "你不需要换工作，你需要在工作之外找到一件真正让你有感觉的事。先把生命力找回来，再看看这份工作在你眼中是否还值得留下。"
+  },
+  {
+    range: [19, 23],
+    type: "倦怠型",
+    subtitle: "你累了，但还撑着",
+    desc: "你不是不努力，你是努力太久了，但产出和回报的比例让你越来越难以说服自己继续。你不是躺平，你是<strong>真的耗光了</strong>。外表还在运转，内心已经停机。",
+    traits: ["高度内耗", "情绪钝化", "身体在透支"],
+    state: "你正在经历职业倦怠的典型状态。这不是态度问题，是能量耗尽后的系统自我保护。你需要的不是「更努力」，而是先停下来，认真问自己：我到底在为谁在跑？",
+    advice: "先休息，再决策。很多人在最累的时候做的决定，不是最好的决定。给自己一段时间喘气，让身体先恢复，再看这份工作和这段生活要怎么重新安排。"
+  },
+  {
+    range: [24, 28],
+    type: "冒险型",
+    subtitle: "你已经在等一个出口了",
+    desc: "你对现状有强烈的不满足，同时对未知有很高的接受度。你不怕改变，你怕的是<strong>一直这样下去</strong>。你内心已经有了方向，只是还差一个让自己跳出去的理由或时机。",
+    traits: ["行动力强", "接受不确定性", "等待触发时机"],
+    state: "你比大多数人更接近改变。你已经不需要有人说服你「要不要换」，你需要的是帮你想清楚「换到哪里去」以及「怎么软着陆」。",
+    advice: "不要等到「完全准备好」才行动，那一天不会来。但也不要在情绪最激动的时候裸辞。找到你的下一个落点，哪怕只有一个模糊的方向，然后给自己定一个时间节点。"
+  }
+];
+
+const answers = new Array(questions.length).fill(null);
+
+function init() {
+  const container = document.getElementById('questions-container');
+  container.innerHTML = '';
+
+  questions.forEach((q, qi) => {
+    const block = document.createElement('div');
+    block.className = 'question-block fade-up';
+    block.style.animationDelay = (qi * 0.06) + 's';
+
+    block.innerHTML = `
+      <div class="q-header">
+        <div class="q-num">${qi + 1}</div>
+        <div class="q-text">${q.text}</div>
+      </div>
+      <div class="options">
+        ${q.options.map((opt, oi) => `
+          <div class="option" id="opt-${qi}-${oi}" onclick="selectOption(${qi}, ${oi})">
+            <div class="option-letter">${opt.letter}</div>
+            <div class="option-text">${opt.text}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    container.appendChild(block);
+  });
+
+  updateProgress();
+}
+
+function selectOption(qi, oi) {
+  // deselect old
+  if (answers[qi] !== null) {
+    document.getElementById(`opt-${qi}-${answers[qi]}`).classList.remove('selected');
+  }
+  answers[qi] = oi;
+  document.getElementById(`opt-${qi}-${oi}`).classList.add('selected');
+  updateProgress();
+}
+
+function updateProgress() {
+  const answered = answers.filter(a => a !== null).length;
+  const remaining = questions.length - answered;
+  const pct = (answered / questions.length) * 100;
+
+  document.getElementById('answered-count').textContent = answered;
+  document.getElementById('remaining-count').textContent = remaining;
+  document.getElementById('progress-bar').style.width = pct + '%';
+
+  const btn = document.getElementById('btn-submit');
+  if (answered === questions.length) {
+    btn.disabled = false;
+    document.querySelector('.submit-hint').innerHTML = '全部作答完成，点击查看结果 ✨';
+    document.querySelector('.submit-hint .count') && (document.querySelector('.submit-hint').innerHTML = '全部作答完成，点击查看结果 ✨');
+  } else {
+    btn.disabled = true;
+    document.querySelector('.submit-hint').innerHTML = `还有 <span class="count">${remaining}</span> 道题未完成`;
+  }
+}
+
+function submitTest() {
+  const total = answers.reduce((sum, ai, qi) => sum + questions[qi].options[ai].score, 0);
+
+  const result = results.find(r => total >= r.range[0] && total <= r.range[1])
+    || results[results.length - 1];
+
+  document.getElementById('result-type').textContent = result.type;
+  document.getElementById('result-subtitle').textContent = result.subtitle;
+  document.getElementById('result-desc').innerHTML = result.desc;
+  document.getElementById('result-state').innerHTML = result.state;
+  document.getElementById('result-advice').innerHTML = result.advice;
+
+  const traitsEl = document.getElementById('result-traits');
+  traitsEl.innerHTML = result.traits.map(t => `<span class="trait">${t}</span>`).join('');
+
+  document.getElementById('test-panel').style.display = 'none';
+  document.getElementById('result-panel').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function retryTest() {
+  answers.fill(null);
+  document.getElementById('test-panel').style.display = 'block';
+  document.getElementById('result-panel').style.display = 'none';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  document.querySelectorAll('.option').forEach(el => el.classList.remove('selected'));
+  updateProgress();
+}
+
+init();
+</script>
+</body>
+</html>
