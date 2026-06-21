@@ -483,7 +483,7 @@
     <div id="questions-container"></div>
 
     <div class="submit-area">
-      <p class="submit-hint">还有 <span class="count" id="remaining-count">7</span> 道题未完成</p>
+      <p class="submit-hint" id="submit-hint">还有 <span class="count" id="remaining-count">7</span> 道题未完成</p>
       <button class="btn-submit" id="btn-submit" disabled onclick="submitTest()">
         查看我的结果 →
       </button>
@@ -682,13 +682,13 @@ function updateProgress() {
   document.getElementById('progress-bar').style.width = pct + '%';
 
   const btn = document.getElementById('btn-submit');
+  const hint = document.getElementById('submit-hint');
   if (answered === questions.length) {
     btn.disabled = false;
-    document.querySelector('.submit-hint').innerHTML = '全部作答完成，点击查看结果 ✨';
-    document.querySelector('.submit-hint .count') && (document.querySelector('.submit-hint').innerHTML = '全部作答完成，点击查看结果 ✨');
+    hint.innerHTML = '全部作答完成，点击查看结果 ✨';
   } else {
     btn.disabled = true;
-    document.querySelector('.submit-hint').innerHTML = `还有 <span class="count">${remaining}</span> 道题未完成`;
+    hint.innerHTML = `还有 <span class="count">${remaining}</span> 道题未完成`;
   }
 }
 
